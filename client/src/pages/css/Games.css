@@ -1,0 +1,45 @@
+.games-container {
+    padding: 20px; /* Padding for the container */
+    max-width: 1200px; /* Maximum width for the container */
+    margin: auto; /* Center the container */
+    overflow: hidden;
+}
+
+.games-title {
+    text-align: center; /* Center the title */
+    font-size: 2rem; /* Font size for the title */
+    margin-bottom: 20px; /* Margin below the title */
+}
+
+.games-list {
+    display: grid; /* Use grid layout for the list */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive columns */
+    gap: 20px; /* Space between the cards */
+}
+
+.game-card {
+    background-color: #f9f9f9; /* Background color for cards */
+    border: 1px solid #ccc; /* Border for cards */
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* Clip overflow */
+    text-align: center; /* Center text */
+    transition: transform 0.3s ease; /* Smooth transition */
+
+    /* Ensures that the card text keeps its original color */
+    text-decoration: none;
+    color: inherit;
+}
+
+.game-card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+}
+
+.game-image {
+    width: 100%; /* Full width for images */
+    height: 200px
+}
+
+.game-title {
+    font-size: 1.25rem; /* Font size for game titles */
+    margin: 10px 0; /* Margin above and below the title */
+}

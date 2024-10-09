@@ -1,0 +1,69 @@
+[
+    {
+      "id": "1",
+      "name": "Final Fantasy XVI",
+      "description": "Final Fantasy XVI is an action RPG that follows the journey of Clive Rosfield in a high-fantasy world torn apart by war, political intrigue, and massive elemental creatures known as Eikons.",
+      "price": 69.99,
+      "image": "ffxvi.png",
+      "genre": "Action RPG",
+      "releaseDate": "2023-06-22",
+      "developer": "Square Enix",
+      "platform": ["PlayStation 5"]
+    },
+    {
+      "id": "2",
+      "name": "Baldur's Gate 3",
+      "description": "Baldur's Gate 3 is a role-playing game set in the Dungeons & Dragons universe, where players navigate a deep narrative-driven story, make tough decisions, and engage in strategic turn-based combat.",
+      "price": 59.99,
+      "image": "bg3.png",
+      "genre": "RPG",
+      "releaseDate": "2023-08-03",
+      "developer": "Larian Studios",
+      "platform": ["PC", "PlayStation 5"]
+    },
+    {
+      "id": "3",
+      "name": "Persona 5 Royal",
+      "description": "Persona 5 Royal is a Japanese RPG where players control a group of high school students who double as vigilante Phantom Thieves, navigating daily life and an alternate world filled with supernatural enemies.",
+      "price": 49.99,
+      "image": "p5r.jpg",
+      "genre": "JRPG",
+      "releaseDate": "2022-10-21",
+      "developer": "Atlus",
+      "platform": ["PC", "PlayStation 4", "Nintendo Switch", "Xbox"]
+    },
+    {
+      "id": "4",
+      "name": "The Legend of Zelda: Tears of the Kingdom",
+      "description": "Tears of the Kingdom is a direct sequel to Breath of the Wild, offering an expansive open-world experience where players control Link to defeat enemies, solve puzzles, and save the kingdom of Hyrule.",
+      "price": 59.99,
+      "image": "totk.jpg",
+      "genre": "Action Adventure",
+      "releaseDate": "2023-05-12",
+      "developer": "Nintendo",
+      "platform": ["Nintendo Switch"]
+    },
+    {
+      "id": "5",
+      "name": "Black Myth: Wukong",
+      "description": "Black Myth: Wukong is a visually stunning action RPG inspired by the Chinese novel Journey to the West, where players control Sun Wukong, the Monkey King, in an epic mythological setting.",
+      "price": 69.99,
+      "image": "wukong.jpg",
+      "genre": "Action RPG",
+      "releaseDate": "2024",
+      "developer": "Game Science",
+      "platform": ["PC", "PlayStation", "Xbox"]
+    },
+    {
+      "id": "6",
+      "name": "Elden Ring",
+      "description": "Elden Ring is an open-world action RPG set in a dark fantasy world created by FromSoftware and George R. R. Martin, featuring exploration, challenging combat, and a deep, mysterious narrative.",
+      "price": 59.99,
+      "image": "eldenring.avif",
+      "genre": "Action RPG",
+      "releaseDate": "2022-02-25",
+      "developer": "FromSoftware",
+      "platform": ["PC", "PlayStation", "Xbox"]
+    }
+  ]
+  

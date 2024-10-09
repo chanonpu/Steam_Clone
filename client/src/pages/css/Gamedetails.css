@@ -1,0 +1,109 @@
+/* Black & White Theme */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.game-details-page {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 2px solid #000;
+  background-color: #f8f8f8;
+  box-shadow: 5px 5px 0 #000;
+  align-items: center;
+  text-align: center;
+}
+
+.game-details-title {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+}
+
+.game-details-image {
+  display: block;
+  max-width: 65%;
+  height: auto;
+  margin: 20px auto;
+  border: 2px solid #000;
+  box-shadow: 5px 5px 0 #000;
+}
+
+.game-details-details {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.game-details-details p {
+  margin: 10px 0;
+}
+
+.game-details-details strong {
+  color: #000;
+  text-transform: uppercase;
+}
+
+.add-to-cart {
+  display: inline-block;
+  padding: 12px 20px;
+  /* Padding for the button */
+  font-size: 16px;
+  /* Font size for the button text */
+  font-weight: bold;
+  /* Make the text bold */
+  text-align: center;
+  /* Center the text */
+  text-decoration: none;
+  /* Remove underline from the link */
+  color: #fff;
+  /* Text color */
+  background-color: #000;
+  /* Background color */
+  border: none;
+  /* No border */
+  border-radius: 5px;
+  /* Rounded corners */
+  transition: background-color 0.3s ease, transform 0.2s;
+  /* Smooth transition for background color and scale */
+  cursor: pointer;
+  /* Change cursor to pointer on hover */
+}
+
+.add-to-cart:hover {
+  background-color: #444;
+  /* Darker background on hover */
+  transform: scale(1.05);
+  /* Slightly enlarge the button on hover */
+}
+
+.add-to-cart:active {
+  background-color: #222;
+  /* Even darker background when clicked */
+  transform: scale(0.95);
+  /* Slightly shrink the button when clicked */
+}
+
+@media (max-width: 768px) {
+  .game-details-page {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .game-details-title {
+    font-size: 2rem;
+  }
+
+  .game-details-image {
+    margin: 10px auto;
+  }
+}

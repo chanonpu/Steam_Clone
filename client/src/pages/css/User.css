@@ -1,0 +1,64 @@
+/* User profile styling */
+.user-profile-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f4f4;
+}
+
+.user-profile-card {
+  background-color: white;
+  padding: 40px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+}
+
+h2 {
+  margin-top: 20px;
+  color: #333;
+}
+
+.game-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.game-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.game-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+.game-list img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover; /* Ensures the image fits nicely */
+  margin-right: 15px;
+}
+
+.logout-button {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #555;
+}
