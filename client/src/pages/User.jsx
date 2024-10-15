@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './css/User.css';
 
 const User = () => {
     const id = useParams().id;
     const [data, setData] = useState([]);
     const [games, setGames] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -34,17 +35,19 @@ const User = () => {
         }
     };
 
+    // go to upload page
+    const handleUpload = () => {
+        navigate('/upload');
+    }
+
     return (
         <div className='user-profile-container'>
             <h1>User Profile</h1>
             <p>{data.email}</p>
-
-
-
             <h2>Owned Games List</h2>
             <ul className="game-list">
                 {games.map((game) => (
-                    <a className='game-link' href={`/games/${game.id}`}>
+                    <a key={game.id} className='game-link' href={`/games/${game.id}`}>
                     <li className="game-card">
                         <img src={`http://localhost:8000/img/${game.image}`} alt={game.title} className="game-image" />
                         <p>{game.name}</p>
@@ -52,7 +55,7 @@ const User = () => {
                     </a>
                 ))}
             </ul>
-
+            <button className='upload-button' onClick={handleUpload}>Upload Game</button>
             <button className='logout-button' onClick={handleLogout}>Log out</button>
         </div>
     )

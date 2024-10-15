@@ -48,6 +48,7 @@ h2 {
   margin-right: 15px;
 }
 
+.upload-button,
 .logout-button {
   display: block;
   margin: 20px auto 0;

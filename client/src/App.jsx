@@ -8,7 +8,8 @@ import Search from './pages/Search';
 import GameDetails from './pages/Gamedetails';
 import Register from './pages/Register';
 import User from './pages/User';
-// import Cart from './pages/Cart';
+import Cart from './pages/Cart';
+import Upload from './pages/Upload';
 
 
 function App() {
@@ -22,9 +23,11 @@ function App() {
           <Route path="/games/:id" element={<GameDetails />} /> {/* Route for product details page */}
           <Route path="/search" element={<Search />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/cart" element={<Login />} /> {/* If no login go to login instead */}
+          <Route path="/cart/:id" element={<Cart />} />
           <Route path="/register" element={<Register />} /> {/* Route for register */}
           <Route path="/user/:id" element={<User />} /> {/* Route for profile page */}
-          {/* <Route path="/cart" element={<Cart />} /> */}
+          <Route path="/upload" element={<Upload />} />
         </Routes>
       </div>
     </Router>

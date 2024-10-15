@@ -31,9 +31,9 @@ router.get('/games/:id', (req, res) => {
 // POST to fetch game details by IDs
 router.post('/games', (req,res) => {
   const {gameIds} = req.body;
-  console.log(gameData);
+  // console.log(gameIds);
   const games = gameData.filter(game => gameIds.includes(game.id));
-  console.log(games);
+  // console.log(games);
   res.json(games);
 })
 
