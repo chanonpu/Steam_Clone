@@ -5,12 +5,12 @@ import './css/Search.css';
 const Search = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get(`http://localhost:8000/search?query=${query}`);
-      console.log('Search results:', response.data);
+      const response = await axios.get(`${SERVER_URL}/game/search?name=${query}`);
       setResults(response.data);
     } catch (error) {
       console.log('Error searching:', error);
@@ -29,10 +29,26 @@ const Search = () => {
         <button type="submit">Search</button>
       </form>
 
-      <div>
-        {results.map((result, index) => (
-          <p key={index}>{result.name}</p>
-        ))}
+      <div className="search-results">
+        {results.length > 0 ? (
+          results.map((game) => (
+            <a key={game._id} className="search-result-item" href={`/games/${game._id}`}>
+              <div className="search-image-container">
+                <img
+                  src={`${SERVER_URL}/img/${game.image}`}
+                  alt={game.title}
+                  className="search-game-image"
+                />
+              </div>
+              <div className="search-text-container">
+                <h2>{game.name}</h2>
+                <p>{game.description}</p>
+              </div>
+            </a>
+          ))
+        ) : (
+          <p className="search-no-results">No games found</p>
+        )}
       </div>
     </div>
   );

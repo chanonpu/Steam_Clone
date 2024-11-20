@@ -1,61 +1,41 @@
+require('dotenv').config();
 const PORT = process.env.PORT || 8000;
 const express = require("express");
 const app = express();
-const fs = require("fs")
 const path = require("path")
 const cors = require("cors");
 
-const fetch_router = require("./routers/fetch_router");
-const save_router = require("./routers/save_router");
+const game_router = require("./routers/game_router");
+const user_router = require("./routers/user_router");
 
 // middlelware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-// routes
+//mongoose
+// adding our mongoDB database
+const mongoose = require("mongoose"); // importing the dependancy
+mongoose.connect(process.env.mongoDB); // establishing a connection
+const db = mongoose.connection; // saving the databse usecase into a variable
 
-app.use("/fetch", fetch_router);
-app.use("/save", save_router);
+db.once("open", () => {
+  // Check connection
+  console.log("Connected to MongoDB");
+});
+
+db.on("error", (err) => {
+  // Check for DB errors
+  console.log("DB Error");
+});
+
+// routes
+app.use("/game", game_router);
+app.use("/user", user_router);
 app.use('/img', express.static(path.join(__dirname, 'data/img')));
 
 app.get("/", (req, res) => {
   res.send("Welcome to our server")
-})
-
-app.get('/games', (req, res) => {
-  // Read gamedata.json file
-  fs.readFile(path.join(__dirname, 'data/gamedata.json'), 'utf-8', (err, data) => {
-    if (err) {
-      console.error('Error reading gamedata.json:', err);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    // Parse the JSON data and send it back
-    res.json(JSON.parse(data));
-  });
-});
-
-// handle login
-
-app.post("/login", (req, res) => {
-  const { email, password} = req.body;
-  console.log("email: "+email);
-  console.log("password: "+password);
-})
-
-// handle register
-
-app.post("/register", (req, res) => {
-  const { email, password} = req.body;
-  console.log(email + " " + password);
-
-})
-
-//handle search using query
-
-app.get("/search", (req, res) => {
-  console.log(req.query)
 })
 
 app.listen(PORT, () => {

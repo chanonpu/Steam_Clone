@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './css/Login.css';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [result, setResult] = useState('');
+  const navigate = useNavigate();
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/login', { email, password });
-      console.log('Login success:', response.data);
+      const response = await axios.post(`${SERVER_URL}/user/login`, { username, password });
+      navigate(`/user/${username}`)
     } catch (error) {
-      console.log('Error logging in:', error);
+      setResult(error.response.data.error);
     }
   };
 
@@ -20,19 +24,22 @@ const Login = () => {
     <div className="login-page-container">
       <h1>Login</h1>
       <form onSubmit={handleLogin} className="login-form">
-        <label>Email</label>
+        <label>Username</label>
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
         />
         <label>Password</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
-        <button type="submit">Login</button>
+        <button type="submit" >Login</button>
+        {result && <p style={{ color: 'red' }}>{result}</p>}
         <a href="/register">Create an account</a>
       </form>
     </div>

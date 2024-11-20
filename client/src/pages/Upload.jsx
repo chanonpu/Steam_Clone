@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './css/Upload.css'
 
 const Upload = () => {
+    const username = useParams().username;
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState(0);
     const [genre, setGenre] = useState([]);
     const [image, setImage] = useState(null);
     const [platforms, setPlatforms] = useState([]);
+    const [result, setResult] = useState([]);
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
     const handleNameChange = (e) => {
         setName(e.target.value);
@@ -39,21 +43,20 @@ const Upload = () => {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append('id',"123456") //make some unique
         formData.append('name', name);
         formData.append('description', description);
         formData.append('price', price);
         formData.append('image', image);
         formData.append('genre', genre);
-        formData.append('releaseDate', new Date);
-        formData.append('developer', "userId"); // change
+        formData.append('developer', username);
         formData.append('platforms', JSON.stringify(platforms));
         console.log(formData)
         try {
-            const response = await axios.post('http://localhost:8000/save/upload', formData);
+            const response = await axios.post(`${SERVER_URL}/game/upload`, formData);
             alert('Game uploaded successfully');
         } catch (error) {
-            console.error('Error uploading game:', error);
+            const errorMessages = error.response.data.errors.map((err) => err.msg);
+            setResult(errorMessages);
         }
     };
 
@@ -74,8 +77,8 @@ const Upload = () => {
                 <label>Platform</label>
                 <div className="platform-checkboxes">
                     <label>
-                        <input type="checkbox" value="PS5" onChange={handlePlatformChange} />
-                        PS5
+                        <input type="checkbox" value="PS" onChange={handlePlatformChange} />
+                        PS
                     </label>
                     <label>
                         <input type="checkbox" value="NSW" onChange={handlePlatformChange} />
@@ -92,6 +95,16 @@ const Upload = () => {
                 </div>
                 <button type="submit">Upload</button>
             </form>
+
+            {/* Show if there any validate error */}
+            {result.length > 0 && (
+                <div style={{ color: 'red' }}>
+                    {result.map((error, index) => (
+                        <p key={index}>{error}</p>
+                    ))}
+                </div>
+            )}
+            
         </div>
     );
 };

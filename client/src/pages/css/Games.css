@@ -1,45 +1,106 @@
 .games-container {
-    padding: 20px; /* Padding for the container */
-    max-width: 1200px; /* Maximum width for the container */
-    margin: auto; /* Center the container */
-    overflow: hidden;
+  display: flex;
+}
+
+.filter-sidebar {
+  width: 250px;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-right: 1px solid #ddd;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-options {
+  /* display: flex; */
+  
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.filter-checkbox {
+  height: 20px;
+  width: 20px;
+}
+
+.checkbox-text {
+  font-size: 14px;
+  color: #333;
+}
+
+.price-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-select {
+  width: 60px;
+  padding: 5px;
+}
+
+.price-input {
+  width: 80px;
+  padding: 5px;
+}
+
+
+.games-list-container {
+  flex: 1;
+  padding: 20px;
 }
 
 .games-title {
-    text-align: center; /* Center the title */
-    font-size: 2rem; /* Font size for the title */
-    margin-bottom: 20px; /* Margin below the title */
+  font-size: 2em;
+  margin-bottom: 15px;
+  color: #333;
 }
 
 .games-list {
-    display: grid; /* Use grid layout for the list */
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive columns */
-    gap: 20px; /* Space between the cards */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
 }
 
 .game-card {
-    background-color: #f9f9f9; /* Background color for cards */
-    border: 1px solid #ccc; /* Border for cards */
-    border-radius: 8px; /* Rounded corners */
-    overflow: hidden; /* Clip overflow */
-    text-align: center; /* Center text */
-    transition: transform 0.3s ease; /* Smooth transition */
-
-    /* Ensures that the card text keeps its original color */
-    text-decoration: none;
-    color: inherit;
+  flex: 1 1 200px; /* Flex-grow, flex-shrink, and base width */
+  max-width: 250px; /* Optional max width */
+  height: 400px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
 }
 
 .game-card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
 }
 
 .game-image {
-    width: 100%; /* Full width for images */
-    height: 200px
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 .game-title {
-    font-size: 1.25rem; /* Font size for game titles */
-    margin: 10px 0; /* Margin above and below the title */
+  font-size: 1.1em;
+  font-weight: bold;
+  text-align: center;
 }

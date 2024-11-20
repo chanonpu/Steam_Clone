@@ -24,10 +24,10 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cart" element={<Login />} /> {/* If no login go to login instead */}
-          <Route path="/cart/:id" element={<Cart />} />
+          <Route path="/cart/:username" element={<Cart />} />
           <Route path="/register" element={<Register />} /> {/* Route for register */}
-          <Route path="/user/:id" element={<User />} /> {/* Route for profile page */}
-          <Route path="/upload" element={<Upload />} />
+          <Route path="/user/:username" element={<User />} /> {/* Route for profile page */}
+          <Route path="/user/:username/upload" element={<Upload />} />
         </Routes>
       </div>
     </Router>
