@@ -23,11 +23,10 @@ function App() {
           <Route path="/games/:id" element={<GameDetails />} /> {/* Route for product details page */}
           <Route path="/search" element={<Search />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/cart" element={<Login />} /> {/* If no login go to login instead */}
-          <Route path="/cart/:username" element={<Cart />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/register" element={<Register />} /> {/* Route for register */}
-          <Route path="/user/:username" element={<User />} /> {/* Route for profile page */}
-          <Route path="/user/:username/upload" element={<Upload />} />
+          <Route path="/user" element={<User />} /> {/* Route for profile page */}
+          <Route path="/user/upload" element={<Upload />} />
         </Routes>
       </div>
     </Router>

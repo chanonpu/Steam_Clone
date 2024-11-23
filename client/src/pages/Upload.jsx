@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './css/Upload.css'
 
 const Upload = () => {
-    const username = useParams().username;
+    const token = localStorage.getItem('token');
+    const [username, setUsername] = useState(null);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState(0);
@@ -13,6 +13,15 @@ const Upload = () => {
     const [platforms, setPlatforms] = useState([]);
     const [result, setResult] = useState([]);
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
+    useEffect(() => {
+        if (token) {
+            const decoded = JSON.parse(atob(token.split('.')[1]));;
+            setUsername(decoded.username);
+        } else {
+            window.location.href = '/login';
+        }
+    },[])
 
     const handleNameChange = (e) => {
         setName(e.target.value);
@@ -27,7 +36,11 @@ const Upload = () => {
     };
 
     const handleGenreChange = (e) => {
-        setGenre(e.target.value);
+        // Toggle genre in array when checkbox is checked/unchecked
+        const value = e.target.value;
+        setGenre((prev) =>
+            prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+        );
     };
 
     const handleImageChange = (e) => {
@@ -35,7 +48,11 @@ const Upload = () => {
     };
 
     const handlePlatformChange = (e) => {
-        setPlatforms(e.target.value);
+        // Toggle platform in array when checkbox is checked/unchecked
+        const value = e.target.value;
+        setPlatforms((prev) =>
+            prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+        );
     };
 
 
@@ -47,15 +64,15 @@ const Upload = () => {
         formData.append('description', description);
         formData.append('price', price);
         formData.append('image', image);
-        formData.append('genre', genre);
+        genre.forEach(g => formData.append('genre[]', g));
         formData.append('developer', username);
-        formData.append('platforms', JSON.stringify(platforms));
-        console.log(formData)
+        platforms.forEach(p => formData.append('platform[]', p))
         try {
             const response = await axios.post(`${SERVER_URL}/game/upload`, formData);
             alert('Game uploaded successfully');
         } catch (error) {
             const errorMessages = error.response.data.errors.map((err) => err.msg);
+            console.log(error);
             setResult(errorMessages);
         }
     };
@@ -71,7 +88,17 @@ const Upload = () => {
                 <label>Price</label>
                 <input type='number' step="0.01" onChange={handlePriceChange} />
                 <label>Genre</label>
-                <input type='text' onChange={handleGenreChange} />
+                <div className="platform-checkboxes">
+                    <label>
+                        <input type="checkbox" value="Action" onChange={handleGenreChange} /> Action
+                    </label>
+                    <label>
+                        <input type="checkbox" value="Adventure" onChange={handleGenreChange} /> Adventure
+                    </label>
+                    <label>
+                        <input type="checkbox" value="RPG" onChange={handleGenreChange} /> RPG
+                    </label>
+                </div>
                 <label>Image</label>
                 <input type="file" name="file" onChange={handleImageChange} />
                 <label>Platform</label>
@@ -104,7 +131,7 @@ const Upload = () => {
                     ))}
                 </div>
             )}
-            
+
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/AuthContext';
 import './css/Login.css';
 
 const Login = () => {
@@ -8,13 +9,15 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [result, setResult] = useState('');
   const navigate = useNavigate();
+  const { logIn } = useAuth(); // Use logIn function from AuthContext
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(`${SERVER_URL}/user/login`, { username, password });
-      navigate(`/user/${username}`)
+      logIn(response.data.token); // Call logIn to update the context
+      navigate(`/user/`)
     } catch (error) {
       setResult(error.response.data.error);
     }

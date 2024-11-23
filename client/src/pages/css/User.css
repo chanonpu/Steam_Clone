@@ -55,7 +55,7 @@
 .user-game-card {
   width: 180px;
   padding: 10px;
-  background-color: #292929;
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease;
@@ -68,13 +68,13 @@
 
 .user-game-image {
   width: 100%;
-  height: auto;
+  height: 200px;
   border-radius: 4px;
 }
 
 .user-game-info {
   margin-top: 10px;
-  color: #f1f1f1;
+  color: #f80808;
 }
 
 .user-game-link {
@@ -84,5 +84,5 @@
 
 .user-game-info h3 {
   font-size: 1.1rem;
-  color: #f1f1f1;
+  color: #333;
 }

@@ -26,7 +26,7 @@ const gameSchema = new mongoose.Schema({
       required: true,
     },
   ],
-  releasedate: {
+  releaseDate: {
     type: Date,
     default: Date.now
   },

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 import './NavBar.css';  // Add a CSS file for styles
 
 function NavBar() {
+  const { isLogIn } = useAuth();
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -18,12 +21,14 @@ function NavBar() {
         <li>
           <Link to="/games">Games</Link>
         </li>
-        <li>
-          <Link to="/login">Login</Link>
-        </li>
-        {/* <li>
-          <Link to="/cart">Cart</Link>
-        </li> */}
+        {isLogIn ? (
+          <>
+            <li><Link to="/cart">Cart</Link></li>
+            <li><Link to="/user">Profile</Link></li>
+          </>
+        ) : (
+          <li><Link to="/login">Login</Link></li>
+        )}
       </ul>
     </nav>
   );

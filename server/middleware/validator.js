@@ -1,4 +1,6 @@
 const { body, validationResult } = require("express-validator");
+const path = require("path")
+const fs = require("fs");
 
 // rules for user register
 const registerValidator = [
@@ -31,8 +33,6 @@ const uploadGameValidator = [
         .notEmpty().withMessage("Price is required")
         .isFloat({ gt: 0 }).withMessage('Price must be more than 0'),
 
-    body("image").notEmpty().withMessage("Image is required"),
-
     body('genre')
         .isArray({ min: 1 }).withMessage('At least one genre is required.')
         .custom((value) => value.every(v => typeof v === 'string'))
@@ -47,6 +47,10 @@ const uploadGameValidator = [
 const validate = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        if (req.file) { // if error remove the file uploadeed
+            fs.unlink(path.join(__dirname, `../data/img/${req.file.filename}`), (err) => {
+                if (err) console.error("Failed to remove file:", err);
+            })};
         return res.status(400).json({ errors: errors.array() });
     }
     next();

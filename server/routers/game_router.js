@@ -24,6 +24,7 @@ router.get('/fetch/:id', async (req, res) => {
     if (!game) {
       return res.status(404).json({ message: 'Game not found' });
     }
+    console.log(game);
     res.json(game);
   } catch (error) {
     res.status(500).json({ message: 'Could not fetch game data' });
@@ -49,12 +50,12 @@ router.get("/search", async (req, res) => {
 })
 
 // upload new game
-router.post("/upload", uploadGameValidator, validate, upload.single("image"), async (req, res) => {
+router.post("/upload", upload.single("image"), uploadGameValidator, validate, async (req, res) => {
 
+  // validator for image.
   if (!req.file) {
-    return res.status(400).send("No file uploaded.");
+    return res.status(400).json({ msg: "Image is required" });
   }
-  // res.json({ message: `File uploaded successfully: ${req.file.path}` });
 
   const { name, description, price, genre, developer, platform } = req.body;
   const image = req.file.filename;
@@ -124,7 +125,7 @@ router.get("/filter", (req, res) => {
   if (req.query.genre) {
     filters.genre = { "$all": JSON.parse(req.query.genre) };
   }
-  if (req.query.releaseDate ) {
+  if (req.query.releaseDate) {
     switch (req.query.releaseDate) {
       case "last_year":
         filters.releasedate = { "$gte": new Date(Date.now() - 31536000000) };
@@ -150,5 +151,29 @@ router.get("/filter", (req, res) => {
 
 })
 
+// Create a PUT route with param of id to find and edit game on the front end
+router.put("/update/:id", (req, res) => {
+  Game.findByIdAndUpdate(req.params.id, req.body)
+    .then((Updatedgame) => {
+      res.json(Updatedgame); // Return updated game
+    })
+    .catch((err) => {
+      res.status(500).send(err); // Handle error
+    });
+});
+
+// Create a DELETE route with param of id to find and delete the selected game
+router.delete("/delete/:id", (req, res) => {
+  Game.deleteOne({ _id: id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        return res.status(404).send({ message: "Game not found" });
+      }
+      res.send({ message: "Game deleted successfully" });
+    })
+    .catch((err) => {
+      res.status(500).send(err); // Handle error
+    });
+});
 
 module.exports = router;
