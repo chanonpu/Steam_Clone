@@ -39,15 +39,14 @@ const userSchema = new mongoose.Schema({
   ],
   cart: [
     {
-      game: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Game'
-      },
-      quantity: {
-        type: Number,
-        required: true,
-        default: 1
-      }
+    }
+  ],
+  uploadedGame: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Game'
     }
   ]
 });

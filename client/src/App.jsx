@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import User from './pages/User';
 import Cart from './pages/Cart';
 import Upload from './pages/Upload';
+import EditGame from './pages/Editgame';
 
 
 function App() {
@@ -26,7 +27,8 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/register" element={<Register />} /> {/* Route for register */}
           <Route path="/user" element={<User />} /> {/* Route for profile page */}
-          <Route path="/user/upload" element={<Upload />} />
+          <Route path="/user/upload" element={<Upload />} /> {/* Route for upload game */}
+          <Route path="/games/edit/:gameId" element={<EditGame />} /> {/* Route for edit / delete game */}
         </Routes>
       </div>
     </Router>

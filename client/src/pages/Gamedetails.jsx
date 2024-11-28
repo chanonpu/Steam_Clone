@@ -5,7 +5,6 @@ import './css/Gamedetails.css';
 
 const GameDetails = () => {
   const { id } = useParams(); // Get the Game ID from the route
-  const [username, setUsername] = useState(null);
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [purchased, setPurchased] = useState(false);
@@ -31,17 +30,18 @@ const GameDetails = () => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          const decoded = JSON.parse(atob(token.split('.')[1]));
-          setUsername(decoded.username);
-          const response = await axios.get(`${SERVER_URL}/user/user/${decoded.username}`);
+          const response = await axios.get(`${SERVER_URL}/user/user/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          });
           if (response.data.gamesOwn.includes(id)) {
             setPurchased(true);
           }
-          else if (response.data.cart.some(item => item._id.toString() === id.toString())) {
+          else if (response.data.cart.includes(id)) {
             setInCart(true);
           }
           if (response.data.wishList.includes(id)) {
-            console.log("HI");
             setIsInWishlist(true); // Check if game is in wishlist
           }
         }
@@ -62,9 +62,17 @@ const GameDetails = () => {
   }
 
   const addToCart = async () => {
-    // Add game to cart logic here
+
     try {
-      const response = await axios.post(`${SERVER_URL}/user/cart/`, { id, username });
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${SERVER_URL}/user/cart/`, {
+        id: id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
       alert("added to cart")
       setInCart(true);
     } catch (error) {
@@ -74,23 +82,36 @@ const GameDetails = () => {
 
   const removeFromCart = () => {
     try {
-      axios.delete(`${SERVER_URL}/user/cart/${id}/${username}`)
-        .then(() => {
-          alert("removed from cart")
-          setInCart(false);
-        })
-        .catch((error) => {
-          console.log('Error removing game from cart: ', error);
-        });
+      const token = localStorage.getItem('token');
+      const response = axios.delete(`${SERVER_URL}/user/cart/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      );
+      alert("removed from cart")
+      setInCart(false);
     } catch (error) {
-      console.log('Error removing game from cart: ', error);
+      console.log('Error removing from cart: ', error);
     }
-  };
+  }
 
   const toggleWishlist = async () => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("Please login to add to wishlist");
+        return;
+      }
       const action = isInWishlist ? 'remove' : 'add';
-      await axios.post(`${SERVER_URL}/user/wishlist`, { gameId: id, username, action });
+      const response = await axios.post(`${SERVER_URL}/user/wishlist/`, {
+        gameId: id, action: action
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      );
       setIsInWishlist(!isInWishlist);
     } catch (error) {
       console.error('Error updating wishlist:', error);

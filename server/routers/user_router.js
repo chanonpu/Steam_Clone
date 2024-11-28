@@ -4,24 +4,38 @@ const User = require('../models/user');
 const Game = require('../models/game');
 const Order = require('../models/order');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { registerValidator, loginValidator, validate } = require('../middleware/validator')
+const { generateToken, verifyToken } = require('../middleware/auth')
 
 // route to handle register new user
-router.post("/register", registerValidator, validate, (req, res) => {
+router.post("/register", registerValidator, validate, async (req, res) => {
     const { username, email, password } = req.body;
+
+    // Check if existed
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+        return res.status(400).json({ message: 'Email already exists' });
+    }
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+        return res.status(400).json({ message: 'Username already exists' });
+    }
+
+
+    // Hash the password
     bcrypt
         .genSalt(10)
         .then(salt => {
             return bcrypt.hash(password, salt)
         })
-        .then((hashedPassword) => {
+        .then(async (hashedPassword) => {
             const newUser = new User({
                 username,
                 email,
                 password: hashedPassword
             });
-            return newUser.save();
+            return await newUser.save();
         })
         .then((result) => {
             res.status(201).json({ message: "Account Created" });
@@ -45,9 +59,7 @@ router.post("/login", loginValidator, validate, async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET,
-            { expiresIn: '1h' } // token expire in 1 hr
-        );
+        const token = generateToken(user);
 
         return res.status(200).json({
             result: "correct",
@@ -61,32 +73,34 @@ router.post("/login", loginValidator, validate, async (req, res) => {
 })
 
 // Route to fetch user details exclude password from userdata.json
-router.get('/user/:username', async (req, res) => {
+router.get('/user', verifyToken, async (req, res) => {
     try {
-        const username = req.params.username;
+        const username = req.user;
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
         const userData = user.toJSON();
-        delete userData.password;
+        delete userData.password; //remove password from the data
         res.json(userData);
     } catch (err) {
-        console.log(error)
+        console.log(err)
         res.status(500).json({ error: "Error fetching user details" });
     }
 
 });
 
 // Router to add game to user cart
-router.post('/cart', async (req, res) => {
+router.post('/cart', verifyToken, async (req, res) => {
     try {
-        const { id, username } = req.body;
+        const id = req.body.id;
+        const username = req.user;
         const user = await User.findOne({ username: username });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
         const game = await Game.findOne({ _id: id });
+
         if (!game) {
             return res.status(404).json({ message: 'Game not found' });
         }
@@ -105,9 +119,10 @@ router.post('/cart', async (req, res) => {
 });
 
 // Router to remove game from user cart
-router.delete('/cart/:gameId/:username', async (req, res) => {
+router.delete('/cart/:gameId/', verifyToken, async (req, res) => {
     try {
-        const { gameId, username } = req.params;
+        const { gameId } = req.params;
+        const username = req.user;
 
         // Find the user by username
         const user = await User.findOne({ username });
@@ -137,9 +152,9 @@ router.delete('/cart/:gameId/:username', async (req, res) => {
 });
 
 // Router to checkout (move from cart to gamesOwn) and add order item to database
-router.post('/checkout', async (req, res) => {
+router.post('/checkout', verifyToken, async (req, res) => {
     try {
-        const username = req.body.username;
+        const username = req.user;
         const user = await User.findOne({ username: username });
 
         if (!user) {
@@ -153,7 +168,7 @@ router.post('/checkout', async (req, res) => {
 
         const gamesOwn = user.gamesOwn;
         const items = [];
-        let totalPrice = 0;  // Total price should be a variable, not constant
+        let totalPrice = 0;
 
         for (const gameId of cart) {
             const game = await Game.findOne({ _id: gameId });
@@ -193,9 +208,10 @@ router.post('/checkout', async (req, res) => {
 });
 
 // Route to add / remove wishlist to user
-router.post('/wishlist', async (req, res) => {
+router.post('/wishlist', verifyToken, async (req, res) => {
     try {
-        const { gameId, username, action } = req.body;
+        const { gameId, action } = req.body;
+        const username = req.user;
 
         // Validate action
         if (!['add', 'remove'].includes(action)) {
@@ -203,13 +219,18 @@ router.post('/wishlist', async (req, res) => {
         }
 
         const user = await User.findOne({ username: username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
+        // add to wishlist
         if (action === 'add') {
             if (user.wishList.includes(gameId) || user.gamesOwn.includes(gameId)) {
                 return res.status(400).json({ message: 'Game already in wishlist' });
             }
             user.wishList.push(gameId);
         } else if (action === 'remove') {
+            // remove from wishlist
             user.wishList = user.wishList.filter(id => !id.equals(gameId));
         }
         await user.save();

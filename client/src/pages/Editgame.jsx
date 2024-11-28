@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './css/Upload.css'
 
-const Upload = () => {
+const EditGame = () => {
     const token = localStorage.getItem('token');
+    const { gameId } = useParams(); // Get the Game ID from the route
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState(0);
@@ -12,15 +13,28 @@ const Upload = () => {
     const [image, setImage] = useState(null);
     const [platforms, setPlatforms] = useState([]);
     const [result, setResult] = useState([]);
-    const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     const genreType = ["Action", "Adventure", "RPG", "Strategy", "Simulation", "Sandbox", "Rogue-like", "Shooter", "Sports", "Horror", "MOBA"];
 
     useEffect(() => {
+        const fetchGame = async () => {
+            try {
+                const response = await axios.get(`${SERVER_URL}/game/fetch/${gameId}`);
+                setName(response.data.name);
+                setDescription(response.data.description);
+                setPrice(response.data.price);
+                setGenre(response.data.genre);
+                setPlatforms(response.data.platform);
+            } catch (error) {
+                console.error(error);
+            }
+        }
         if (!token) {
             window.location.href = '/login'; // if not login go to login page instead
         }
-    }, [token])
+        fetchGame();
+
+    }, [gameId, token])
 
     const handleNameChange = (e) => {
         setName(e.target.value);
@@ -53,7 +67,7 @@ const Upload = () => {
     };
 
 
-    const uploadGame = async (e) => {
+    const editGame = async (e) => {
         e.preventDefault();
 
         const formData = new FormData();
@@ -64,7 +78,7 @@ const Upload = () => {
         genre.forEach(g => formData.append('genre[]', g));
         platforms.forEach(p => formData.append('platform[]', p))
         try {
-            const response = await axios.post(`${SERVER_URL}/game/upload`, formData,
+            const response = await axios.put(`${SERVER_URL}/game/update/${gameId}`, formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -72,8 +86,8 @@ const Upload = () => {
                     }
                 }
             );
-            alert('Game uploaded successfully');
-            navigate(`/user/`)
+            alert('Game edited successfully');
+            window.location.href = '/user'; // go back to user page
         } catch (error) {
             const errorMessages = error.response.data.errors.map((err) => err.msg);
             console.log(error);
@@ -81,55 +95,77 @@ const Upload = () => {
         }
     };
 
+    const handleDeleteGame = async () => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this game?');
+        if (confirmDelete) {
+            try {
+                await axios.delete(`${SERVER_URL}/game/delete/${gameId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                alert('Game deleted successfully');
+                window.location.href = '/user'; // go back to user page
+            } catch (error) {
+                console.error(error);
+                alert('Failed to delete the game');
+            }
+        }
+    };
+
     return (
         <div className="upload-page-container">
-            <h1>Upload Game</h1>
-            <form onSubmit={uploadGame} className="upload-form">
+            <h1>Edit Game</h1>
+            <form onSubmit={editGame} className="upload-form">
                 <label className="upload-title">Name</label>
-                <input type='text' onChange={handleNameChange} />
+                <input type='text' onChange={handleNameChange} value={name} />
                 <label className="upload-title">Description</label>
-                <input type='text' onChange={handleDescriptionChange} />
+                <input type='text' onChange={handleDescriptionChange} value={description} />
                 <label className="upload-title">Price</label>
-                <input type='number' step="0.01" onChange={handlePriceChange} />
+                <input type='number' step="0.01" onChange={handlePriceChange} value={price} />
 
                 <label className="upload-title">Image</label>
                 <input type="file" name="file" onChange={handleImageChange} />
                 <label className="upload-title">Platform</label>
                 <div className="platform-checkboxes">
                     <label>
-                        <input type="checkbox" value="PS" onChange={handlePlatformChange} />
+                        <input type="checkbox" value="PS" onChange={handlePlatformChange} checked={platforms.includes("PS")}/>
                         PS
                     </label>
                     <label>
-                        <input type="checkbox" value="NSW" onChange={handlePlatformChange} />
+                        <input type="checkbox" value="NSW" onChange={handlePlatformChange} checked={platforms.includes("NSW")}/>
                         NSW
                     </label>
                     <label>
-                        <input type="checkbox" value="XBOX" onChange={handlePlatformChange} />
+                        <input type="checkbox" value="XBOX" onChange={handlePlatformChange} checked={platforms.includes("XBOX")}/>
                         XBOX
                     </label>
                     <label>
-                        <input type="checkbox" value="PC" onChange={handlePlatformChange} />
+                        <input type="checkbox" value="PC" onChange={handlePlatformChange} checked={platforms.includes("PC")}/>
                         PC
                     </label>
                 </div>
                 <label className="upload-title">Genre</label>
                 <div className="platform-checkboxes">
-                    {genreType.map((genre) => (
-                        <label key={genre}>
+                    {genreType.map((g) => (
+                        <label key={g}>
                             <input
                                 type="checkbox"
-                                value={genre}
+                                value={g}
                                 onChange={handleGenreChange}
+                                checked={genre.includes(g)}
                             />{" "}
-                            {genre}
+                            {g}
                         </label>
                     ))}
                 </div>
                 <button type="submit">Upload</button>
             </form>
 
-            {/* Show if there any validate error */}
+            {/* Delete game button */}
+            <button onClick={handleDeleteGame} className="delete-game-button">Delete Game</button>
+
+            {/* Show if there are any validation errors */}
             {result.length > 0 && (
                 <div style={{ color: 'red' }}>
                     {result.map((error, index) => (
@@ -137,9 +173,8 @@ const Upload = () => {
                     ))}
                 </div>
             )}
-
         </div>
     );
 };
 
-export default Upload;
+export default EditGame;

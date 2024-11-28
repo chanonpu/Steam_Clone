@@ -1,35 +1,29 @@
-const User = require("../models/user")
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
 
-const auth = (req, res, next) => {
-    if (req.session && req.session.user) {
-        User.findOne({ _id: req.session.user._id })
-            .then(user_account => {
-                if (!user_account) {
-                    return res.send("No account found")
-                }
+// Function to generate JWT token
+const generateToken = (user) => {
+    return jwt.sign(
+        {
+            userId: user._id, username: user.username
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+    );
+};
 
-                if (user_account.priv >= 2) {
-                    next();
-                }
-                else {
-                    return res.send("You don't have permission to access this page")
-                }
-            })
-    }
-    return res.status(401).json({ err: "Not Important Enough" })
-}
 
 // Middleware to verify the JWT token
 const verifyToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1]; // Get token from Authorization header
-
     if (!token) {
         return res.status(401).json({ message: "Authorization token required" });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
-        req.user = decoded; // Attach decoded user info to the request object
+        req.user = decoded.username; // Attach decoded user info to the request object
         next(); // Continue to the next middleware/route handler
     } catch (error) {
         res.status(400).json({ message: "Invalid or expired token" });
@@ -37,4 +31,4 @@ const verifyToken = (req, res, next) => {
 };
 
 
-module.exports = {auth, verifyToken};
+module.exports = { generateToken, verifyToken };

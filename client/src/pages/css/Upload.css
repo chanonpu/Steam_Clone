@@ -1,12 +1,14 @@
+/* General container styles */
 .upload-page-container {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 50px auto;
   padding: 2rem;
   background-color: #f4f4f4;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Form layout styles */
 .upload-form {
   display: flex;
   flex-direction: column;
@@ -15,8 +17,14 @@
 .upload-form label {
   margin-top: 10px;
   font-size: 1rem;
+  font-weight: bold;
 }
 
+.upload-title {
+  font-weight: bold;
+}
+
+/* Input field styles */
 .upload-form input[type="text"],
 .upload-form input[type="number"],
 .upload-form input[type="file"] {
@@ -25,25 +33,65 @@
   margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  transition: border 0.3s ease;
 }
 
+.upload-form input[type="text"]:focus,
+.upload-form input[type="number"]:focus,
+.upload-form input[type="file"]:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+/* Platform and Genre checkboxes container */
 .platform-checkboxes {
   margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
 }
 
+/* Checkbox label styles */
 .platform-checkboxes label {
   display: flex;
   align-items: center;
   font-size: 1rem;
+  font-weight: normal;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
+.platform-checkboxes label:hover {
+  color: #777; 
+}
+
+/* Checkbox styles */
 .platform-checkboxes input {
-  margin-right: 8px;
+  margin-right: 10px;
+  margin-top: 15px;
+  width: 18px;
+  height: 18px;
+  background-color: #f4f4f4;
+  border: 2px solid #555;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.platform-checkboxes input:checked {
+  background-color: #555;
+  border-color: #333;
+}
+
+.platform-checkboxes input:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Button styles */
 .upload-form button {
   margin-top: 20px;
   padding: 10px;
@@ -58,4 +106,30 @@
 
 .upload-form button:hover {
   background-color: #555;
+}
+
+.delete-game-button {
+  background-color: #e74c3c;  
+  color: white;            
+  font-size: 16px;          
+  font-weight: bold;        
+  padding: 10px 20px;  
+  margin-top: 50px;      
+  border: none;               
+  border-radius: 5px;         
+  cursor: pointer;           
+  transition: background-color 0.3s ease; 
+}
+
+.delete-game-button:hover {
+  background-color: #c0392b;  
+}
+
+.delete-game-button:focus {
+  outline: none;        
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.5); 
+}
+
+.delete-game-button:active {
+  background-color: #a93226;  
 }

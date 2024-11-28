@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import './css/Cart.css';
 
 function Cart() {
-  const [username, setUsername] = useState(null);
   const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0); // To track total price
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -18,9 +17,11 @@ function Cart() {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const decoded = JSON.parse(atob(token.split('.')[1]));
-        setUsername(decoded.username);
-        const response = await axios.get(`${SERVER_URL}/user/user/${decoded.username}`);
+        const response = await axios.get(`${SERVER_URL}/user/user/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
         const cartData = await axios.post(`${SERVER_URL}/game/games_id`, { gameIds: response.data.cart });
         setCart(cartData.data);
       } else {
@@ -39,7 +40,14 @@ function Cart() {
 
   const removeFromCart = (gameId) => {
     try {
-      axios.delete(`${SERVER_URL}/user/cart/${gameId}/${username}`)
+      const token = localStorage.getItem('token');
+      axios.delete(`${SERVER_URL}/user/cart/${gameId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
         .then(() => {
           // Remove the deleted item from the local cart state
           setCart((prevCart) => prevCart.filter((item) => item._id !== gameId));
@@ -54,9 +62,17 @@ function Cart() {
 
   const handleCheckout = () => {
     try {
-      axios.post(`${SERVER_URL}/user/checkout`, { username: username });
-      alert("Purchase Completed");
-      navigate('/');
+      const token = localStorage.getItem('token');
+      axios.post(`${SERVER_URL}/user/checkout`, {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      ).then(() => {
+        alert("Purchase Completed");
+        navigate('/');
+      })
     } catch (error) {
       console.log('Error checking out: ', error);
     }

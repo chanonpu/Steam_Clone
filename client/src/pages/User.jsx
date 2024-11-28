@@ -5,10 +5,10 @@ import { useAuth } from '../components/AuthContext';
 import './css/User.css';
 
 const User = () => {
-    const [username, setUsername] = useState(null);
     const [data, setData] = useState([]);
     const [games, setGames] = useState([]);
     const [wishList, setWishList] = useState([]);
+    const [gameUploaded, setGameUploaded] = useState([]);
     const navigate = useNavigate();
     const { logOut } = useAuth(); // Use logOut function from AuthContext
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -18,14 +18,18 @@ const User = () => {
             try {
                 const token = localStorage.getItem('token');
                 if (token) {
-                    const decoded = JSON.parse(atob(token.split('.')[1]));
-                    setUsername(decoded.username);
-                    const response = await axios.get(`${SERVER_URL}/user/user/${decoded.username}`);
+                    const response = await axios.get(`${SERVER_URL}/user/user/`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
+                    });
                     setData(response.data);
                     const gameResponse = await axios.post(`${SERVER_URL}/game/games_id`, { gameIds: response.data.gamesOwn });
                     setGames(gameResponse.data);
-                    const wishListResponse = await await axios.post(`${SERVER_URL}/game/games_id`, { gameIds: response.data.wishList });
+                    const wishListResponse = await axios.post(`${SERVER_URL}/game/games_id`, { gameIds: response.data.wishList });
                     setWishList(wishListResponse.data);
+                    const gameUploadedResponse = await axios.post(`${SERVER_URL}/game/games_id`, { gameIds: response.data.uploadedGame });
+                    setGameUploaded(gameUploadedResponse.data);
                 } else {
                     navigate('/login');
                 }
@@ -87,6 +91,23 @@ const User = () => {
                     </li>
                 ))}
             </ul>
+
+            {/* Game uploaded Section (if uploaded) */}
+            {gameUploaded.length>0 && (
+                <div className="user-game-list">
+                    <h2 style={{marginTop: 20}}>Game Uploaded! (Click on the game to edit)</h2>
+                    {gameUploaded.map((game) => (
+                        <li key={game._id} className="user-game-card">
+                            <a href={`/games/edit/${game._id}`} className='user-game-link'>
+                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
+                            <div className="user-game-info">
+                                <h3>{game.name}</h3>
+                            </div>
+                            </a>
+                        </li>
+                    ))}
+                    </div>
+            )}
         </div>
     );
 };

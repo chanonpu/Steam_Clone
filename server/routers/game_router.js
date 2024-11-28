@@ -2,7 +2,11 @@ const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/multer");
 const Game = require("../models/game");
+const User = require('../models/user');
 const { uploadGameValidator, validate } = require('../middleware/validator')
+const { verifyToken } = require('../middleware/auth')
+const path = require("path")
+const fs = require('fs');
 
 // get all game
 router.get('/allgames', async (req, res) => {
@@ -24,7 +28,6 @@ router.get('/fetch/:id', async (req, res) => {
     if (!game) {
       return res.status(404).json({ message: 'Game not found' });
     }
-    console.log(game);
     res.json(game);
   } catch (error) {
     res.status(500).json({ message: 'Could not fetch game data' });
@@ -50,15 +53,16 @@ router.get("/search", async (req, res) => {
 })
 
 // upload new game
-router.post("/upload", upload.single("image"), uploadGameValidator, validate, async (req, res) => {
+router.post("/upload", verifyToken, upload.single("image"), uploadGameValidator, validate, async (req, res) => {
 
   // validator for image.
   if (!req.file) {
     return res.status(400).json({ msg: "Image is required" });
   }
 
-  const { name, description, price, genre, developer, platform } = req.body;
+  const { name, description, price, genre, platform } = req.body;
   const image = req.file.filename;
+  const developer = req.user;
 
   // create new game instance
   const newGame = new Game({
@@ -71,17 +75,23 @@ router.post("/upload", upload.single("image"), uploadGameValidator, validate, as
     platform
   });
 
-  // save game to database
-  newGame
-    .save()
-    .then((savedGame) => {
-      console.log("Success");
-      res.status(201).json(savedGame);
-    })
-    .catch((err) => {
-      console.log(err)
-      res.status(400).send(err);
-    });
+  try {
+    // Save game to database
+    const savedGame = await newGame.save();
+    console.log("Game saved successfully");
+
+    // Add new game id to user's uploaded games
+    const username = req.user;
+    const user = await User.findOne({ username });
+    user.uploadedGame.push(savedGame._id);
+    await user.save();
+
+    res.status(201).json(savedGame); // Send the saved game response
+
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(400).send(err);
+  }
 });
 
 // Route to fetch new releases
@@ -151,29 +161,90 @@ router.get("/filter", (req, res) => {
 
 })
 
-// Create a PUT route with param of id to find and edit game on the front end
-router.put("/update/:id", (req, res) => {
-  Game.findByIdAndUpdate(req.params.id, req.body)
-    .then((Updatedgame) => {
-      res.json(Updatedgame); // Return updated game
-    })
-    .catch((err) => {
-      res.status(500).send(err); // Handle error
-    });
+// route to update the game
+router.put("/update/:id", verifyToken, upload.single("image"), uploadGameValidator, validate, async (req, res) => {
+  const username = req.user;
+
+  try {
+    const game = await Game.findById(req.params.id);
+    if (!game) {
+      return res.status(404).send({ message: "Game not found" });
+    }
+
+    if (game.developer === username || username === 'admin') {
+
+      // Update game details from the request body
+      game.name = req.body.name;
+      game.description = req.body.description;
+      game.genre = req.body.genre;
+      game.price = req.body.price;
+      game.platform = req.body.platform;
+
+      // If a new image is uploaded, delete the old image
+      if (req.file) {
+        // Delete the old image from the server
+        const oldImagePath = path.join(__dirname, "../data/img", game.image);
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.error("Error deleting old image:", err);
+          }
+        });
+
+        // Update the game with the new image
+        game.image = req.file.filename;
+      }
+
+      // Save the updated game
+      await game.save();
+      res.json(game);
+    } else {
+      res.status(403).send({ message: "You do not have permission to edit this game" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Server error" });
+  }
 });
 
-// Create a DELETE route with param of id to find and delete the selected game
-router.delete("/delete/:id", (req, res) => {
-  Game.deleteOne({ _id: id })
-    .then((result) => {
-      if (result.deletedCount === 0) {
-        return res.status(404).send({ message: "Game not found" });
+// route to delete game
+router.delete("/delete/:id", verifyToken, async (req, res) => {
+  const username = req.user;
+
+  try {
+    const game = await Game.findById(req.params.id);
+
+    if (!game) {
+      return res.status(404).send({ message: "Game not found" });
+    }
+
+    if (game.developer === username || username === 'admin') {
+      // If the game has an image, delete it from the server
+      if (game.image) {
+        const imagePath = path.join(__dirname, "../data/img", game.image);
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error("Error deleting image:", err);
+          }
+        });
       }
-      res.send({ message: "Game deleted successfully" });
-    })
-    .catch((err) => {
-      res.status(500).send(err); // Handle error
-    });
+
+      // Delete the game from the database
+      await Game.findByIdAndDelete(req.params.id);
+
+      // Delete the game from user uploaded
+      const user = await User.findOne({ username });
+      user.uploadedGame.pull(req.params.id);
+      await user.save();
+
+      res.json({ message: "Game deleted successfully" });
+    } else {
+      res.status(403).send({ message: "You do not have permission to delete this game" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Server error" });
+  }
 });
+
 
 module.exports = router;
