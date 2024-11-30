@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/Search.css';
 
 const Search = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
+  const navigate = useNavigate();
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
   const handleSearch = async (e) => {
@@ -15,6 +17,10 @@ const Search = () => {
     } catch (error) {
       console.log('Error searching:', error);
     }
+  };
+
+  const handleGameClick = (gameId) => {
+    navigate(`/games/${gameId}`);
   };
 
   return (
@@ -32,7 +38,12 @@ const Search = () => {
       <div className="search-results">
         {results.length > 0 ? (
           results.map((game) => (
-            <a key={game._id} className="search-result-item" href={`/games/${game._id}`}>
+            <div
+              key={game._id}
+              className="search-result-item"
+              onClick={() => handleGameClick(game._id)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="search-image-container">
                 <img
                   src={`${SERVER_URL}/img/${game.image}`}
@@ -44,7 +55,7 @@ const Search = () => {
                 <h2>{game.name}</h2>
                 <p>{game.description}</p>
               </div>
-            </a>
+            </div>
           ))
         ) : (
           <p className="search-no-results">No games found</p>

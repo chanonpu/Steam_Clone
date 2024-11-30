@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/Home.css';
 
 const Home = () => {
     const [newReleases, setNewReleases] = useState([]);
     const [topRanked, setTopRanked] = useState([]);
+    const navigate = useNavigate();
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
     useEffect(() => {
@@ -21,6 +23,10 @@ const Home = () => {
         fetchGames();
     }, []);
 
+    const handleCardClick = (gameId) => {
+        navigate(`/games/${gameId}`); // Navigate to the game details page
+    };
+
     return (
         <div className="homepage-container">
 
@@ -33,14 +39,19 @@ const Home = () => {
                 <h2>Top Ranked Games</h2>
                 <div className="top-ranked-cards">
                     {topRanked.slice(0, 3).map((game, index) => (
-                        <a key={game.id} className={`top-game-card rank-${index + 1}`} href={`/games/${game._id}`}>
-                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.name} style={{height:'50%'}}/>
+                        <div
+                            key={game.id}
+                            className={`top-game-card rank-${index + 1}`}
+                            onClick={() => handleCardClick(game._id)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.name} style={{ height: '50%' }} />
                             <div className="game-info">
                                 <h3>{game.name}</h3>
                                 <p>{game.description}</p>
                                 <span className="price">${game.price}</span>
                             </div>
-                        </a>
+                        </div>
                     ))}
                 </div>
             </section>
@@ -48,13 +59,18 @@ const Home = () => {
             <section className="new-releases-section">
                 <h2>New Releases</h2>
                 <div className="new-releases-grid">
-                    {newReleases.map(game => (
-                        <a key={game.id} className="game-card" href={`/games/${game._id}`}>
-                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.name} style={{maxWidth:'100%', height:'70%'}} />
+                    {newReleases.map((game) => (
+                        <div
+                            key={game.id}
+                            className="game-card"
+                            onClick={() => handleCardClick(game._id)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.name} style={{ maxWidth: '100%', height: '70%' }} />
                             <h3>{game.name}</h3>
                             {/* <p>{game.description}</p> */}
                             <span className="price">${game.price}</span>
-                        </a>
+                        </div>
                     ))}
                 </div>
             </section>

@@ -54,6 +54,14 @@ const User = () => {
         navigate(`/user/upload`);
     };
 
+    const handleGameClick = (gameId) => {
+        navigate(`/games/${gameId}`);
+    };
+
+    const handleEditGameClick = (gameId) => {
+        navigate(`/games/edit/${gameId}`);
+    };
+
     return (
         <div className='user-profile-container'>
             <div className="user-profile-header">
@@ -66,47 +74,56 @@ const User = () => {
             <h2>Owned Games</h2>
             <ul className="user-game-list">
                 {games.map((game) => (
-                    <li key={game._id} className="user-game-card">
-                        <a href={`/games/${game._id}`} className='user-game-link'>
-                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
-                            <div className="user-game-info">
-                                <h3>{game.name}</h3>
-                            </div>
-                        </a>
+                    <li
+                        key={game._id}
+                        className="user-game-card"
+                        onClick={() => handleGameClick(game._id)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
+                        <div className="user-game-info">
+                            <h3>{game.name}</h3>
+                        </div>
                     </li>
                 ))}
             </ul>
 
             {/* Wish List Section */}
-            <h2 style={{marginTop: 20}}>Wish List</h2>
+            <h2 style={{ marginTop: 20 }}>Wish List</h2>
             <ul className="user-game-list">
                 {wishList.map((game) => (
-                    <li key={game._id} className="user-game-card">
-                        <a href={`/games/${game._id}`} className='user-game-link'>
-                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
-                            <div className="user-game-info">
-                                <h3>{game.name}</h3>
-                            </div>
-                        </a>
+                    <li
+                        key={game._id}
+                        className="user-game-card"
+                        onClick={() => handleGameClick(game._id)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
+                        <div className="user-game-info">
+                            <h3>{game.name}</h3>
+                        </div>
                     </li>
                 ))}
             </ul>
 
             {/* Game uploaded Section (if uploaded) */}
-            {gameUploaded.length>0 && (
+            {gameUploaded.length > 0 && (
                 <div className="user-game-list">
-                    <h2 style={{marginTop: 20}}>Game Uploaded! (Click on the game to edit)</h2>
+                    <h2 style={{ marginTop: 20 }}>Game Uploaded! (Click on the game to edit)</h2>
                     {gameUploaded.map((game) => (
-                        <li key={game._id} className="user-game-card">
-                            <a href={`/games/edit/${game._id}`} className='user-game-link'>
+                        <li
+                            key={game._id}
+                            className="user-game-card"
+                            onClick={() => handleEditGameClick(game._id)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
                             <div className="user-game-info">
                                 <h3>{game.name}</h3>
                             </div>
-                            </a>
                         </li>
                     ))}
-                    </div>
+                </div>
             )}
         </div>
     );
