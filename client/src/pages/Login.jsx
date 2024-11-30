@@ -23,6 +23,11 @@ const Login = () => {
     }
   };
 
+  // Use navigate function to go to register page
+  const goToRegister = () => {
+    navigate('/register');
+  };
+
   return (
     <div className="login-page-container">
       <h1>Login</h1>
@@ -43,7 +48,7 @@ const Login = () => {
         />
         <button type="submit" >Login</button>
         {result && <p style={{ color: 'red' }}>{result}</p>}
-        <a href="/register">Create an account</a>
+        <button type="button" onClick={goToRegister} style={{marginTop: "20px"}}>Create an account</button>
       </form>
     </div>
   );

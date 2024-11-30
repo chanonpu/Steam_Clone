@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './css/Games.css';
 
 const GamesPage = () => {
@@ -6,6 +7,7 @@ const GamesPage = () => {
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
   const [priceFilter, setPriceFilter] = useState({ direction: "", value: "" });
+  const navigate = useNavigate();
   const genreOptions = ["Action", "Adventure", "RPG", "Strategy", "Simulation", "Sandbox", "Rogue-like", "Shooter", "Sports", "Horror", "MOBA"];
   const platformOptions = ["PS", "XBOX", "PC", "NSW"];
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -35,7 +37,7 @@ const GamesPage = () => {
   const handleGenreChange = (event) => {
     const value = event.target.value;
     setGenres((prev) =>
-      prev.includes(value) ? prev.filter((genre) => genre !== value) : [...prev,value]
+      prev.includes(value) ? prev.filter((genre) => genre !== value) : [...prev, value]
     );
   };
 
@@ -52,6 +54,10 @@ const GamesPage = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleCardClick = (gameId) => {
+    navigate(`/games/${gameId}`);
   };
 
   return (
@@ -114,10 +120,15 @@ const GamesPage = () => {
       {/* Games List */}
       <div className="games-list">
         {games.map((game) => (
-          <a key={game._id} className="game-card" href={`/games/${game._id}`}>
+          <div
+            key={game._id}
+            className="game-card"
+            onClick={() => handleCardClick(game._id)}
+            style={{ cursor: 'pointer' }}
+          >
             <img src={`${SERVER_URL}/img/${game.image}`} alt={game.name} className="game-image" style={{ height: "300px" }} />
             <h2 className="game-title">{game.name}</h2>
-          </a>
+          </div>
         ))}
       </div>
     </div>
