@@ -26,7 +26,10 @@ const verifyToken = (req, res, next) => {
         req.user = decoded.username; // Attach decoded user info to the request object
         next(); // Continue to the next middleware/route handler
     } catch (error) {
-        res.status(400).json({ message: "Invalid or expired token" });
+        if (error.name === 'TokenExpiredError') { // check expired token
+            return res.status(401).json({ message: "Token has expired" });
+        }
+        res.status(400).json({ message: "Invalid token" });
     }
 };
 

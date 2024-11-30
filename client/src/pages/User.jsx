@@ -34,6 +34,11 @@ const User = () => {
                     navigate('/login');
                 }
             } catch (error) {
+                // expired token
+                if(error.response.status === 401) {
+                    localStorage.removeItem('token'); // remove token
+                    navigate('/login'); // go to login page
+                }
                 console.log('Error fetching user data: ', error);
             }
         };
