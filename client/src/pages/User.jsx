@@ -36,7 +36,7 @@ const User = () => {
             } catch (error) {
                 // expired token
                 if(error.response.status === 401) {
-                    localStorage.removeItem('token'); // remove token
+                    logOut(); // Call logOut to handle centralized logout
                     navigate('/login'); // go to login page
                 }
                 console.log('Error fetching user data: ', error);

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/AuthContext';
 import './css/Cart.css';
 
 function Cart() {
   const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0); // To track total price
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+  const { logOut } = useAuth(); // Use logOut function from AuthContext
   const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
@@ -28,6 +30,10 @@ function Cart() {
         navigate('/login');
       }
     } catch (error) {
+      if(error.response.status === 401) {
+        logOut(); // Call logOut to handle centralized logout
+        navigate('/login'); // go to login page
+    }
       console.log('Error fetching user data: ', error);
     }
   };
