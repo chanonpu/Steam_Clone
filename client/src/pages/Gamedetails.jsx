@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../components/AuthContext';
 import './css/Gamedetails.css';
 
 const GameDetails = () => {
@@ -11,6 +12,7 @@ const GameDetails = () => {
   const [inCart, setInCart] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [error, setError] = useState(null);
+  const { logOut } = useAuth();
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
   useEffect(() => {
@@ -46,6 +48,10 @@ const GameDetails = () => {
           }
         }
       } catch (error) {
+        // expired token
+        if (error.response.status === 401) {
+          logOut(); // Call logOut to handle centralized logout
+        }
         console.log('Error fetching user data: ', error);
       }
     }
