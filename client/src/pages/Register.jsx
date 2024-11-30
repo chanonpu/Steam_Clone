@@ -28,16 +28,20 @@ const Register = () => {
     }
   };
 
+  const goToLogin = () => {
+    navigate('/login');
+  }
+
   return (
     <div className="register-container">
       <h1>Register</h1>
       <form onSubmit={handleRegister} className="register-form">
         <label>Username</label>
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required/>
+        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
         <label>Email</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <label>Password</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">Register</button>
 
         {/* Show if there any validate error */}
@@ -49,7 +53,9 @@ const Register = () => {
           </div>
         )}
 
-        <a href="/login">Already have an account? Login here</a>
+        <p className="login-redirect" onClick={goToLogin} style={{ cursor: 'pointer', textDecoration: 'underline', marginTop: '15px' }}>
+          Already have an account? Login here
+        </p>
       </form>
     </div>
   )
