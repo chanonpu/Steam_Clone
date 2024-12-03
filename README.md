@@ -1,4 +1,4 @@
-# Game Store App (Steam Clone) !! Still in Progress !!
+# Game Store App (Steam Clone)
 
 This project is a full-stack web application that allows users to register, log in, view their profiles, upload games, and manage game data. It's a clone of the Steam platform where users can upload games with specific details, view their game library, and manage their account information.
 
