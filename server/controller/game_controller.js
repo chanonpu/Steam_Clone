@@ -16,13 +16,13 @@ const getAllGame = async (req, res) => {
 
 // fetch an image
 const getImage = async (req, res) => {
-    const { name } = req.query;
+    const imgId = req.query.name;
 
-    if (!name) {
+    if (!imgId) {
         return res.status(400).json({ error: "Image name is required." });
     }
 
-    Image.findOne({ filename: name })
+    Image.findById(imgId)
         .then((image) => {
             if (!image) {
                 return res.status(404).json({ error: "Image not found." });
@@ -153,11 +153,10 @@ const uploadGame = async (req, res) => {
 
     try {
         // Save image to database
-        await newImage.save();
+        const savedImage = await newImage.save();
         console.log("File uploaded successfully.");
 
         const { name, description, price, genre, platform } = req.body;
-        const image = file.originalname;
         const developer = req.user;
 
         // Create new game instance
@@ -165,7 +164,7 @@ const uploadGame = async (req, res) => {
             name,
             description,
             price,
-            image,
+            image: savedImage._id,
             genre,
             developer,
             platform
@@ -216,14 +215,12 @@ const updateGame = async (req, res) => {
             // If a new image is uploaded, replace image with the new one
             if (req.file) {
                 const file = req.file;
-                const imageName = game.image;
-                const image = await Image.findOne({ filename: imageName });
+                const image = await Image.findById(game.image);
                 if (image) {
                     image.filename = file.originalname;
                     image.contentType = file.mimetype;
                     image.imageBuffer = file.buffer;
                     image.uploadDate = Date.now();
-                    game.image = file.originalname;
                     await image.save();
                 } else {
                     return res.status(400).send({ message: "Error fetching the image for update" });
@@ -256,7 +253,7 @@ const deleteGame = async (req, res) => {
         if (game.developer === username || username === 'admin') {
             // If the game has an image, delete it from the server
             if (game.image) {
-                await Image.findOneAndDelete({ filename: game.image });
+                await Image.findByIdAndDelete(game.image);
             }
 
             // Delete the game from the database

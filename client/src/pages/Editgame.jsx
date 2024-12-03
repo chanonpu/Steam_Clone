@@ -161,7 +161,7 @@ const EditGame = () => {
                         </label>
                     ))}
                 </div>
-                <button type="submit">Upload</button>
+                <button type="submit">Confirm Change</button>
             </form>
 
             {/* Delete game button */}
