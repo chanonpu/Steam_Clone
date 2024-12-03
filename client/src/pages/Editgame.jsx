@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './css/Upload.css'
 
 const EditGame = () => {
@@ -14,6 +15,7 @@ const EditGame = () => {
     const [platforms, setPlatforms] = useState([]);
     const [result, setResult] = useState([]);
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    const navigate = useNavigate();
     const genreType = ["Action", "Adventure", "RPG", "Strategy", "Simulation", "Sandbox", "Rogue-like", "Shooter", "Sports", "Horror", "MOBA"];
 
     useEffect(() => {
@@ -30,7 +32,7 @@ const EditGame = () => {
             }
         }
         if (!token) {
-            window.location.href = '/login'; // if not login go to login page instead
+            navigate('/login'); // if not login go to login page instead
         }
         fetchGame();
 
@@ -87,7 +89,7 @@ const EditGame = () => {
                 }
             );
             alert('Game edited successfully');
-            window.location.href = '/user'; // go back to user page
+            navigate('/user'); // go back to user page
         } catch (error) {
             console.log(error);
             const errorMessages = error.response.data.errors.map((err) => err.msg);
@@ -105,7 +107,7 @@ const EditGame = () => {
                     },
                 });
                 alert('Game deleted successfully');
-                window.location.href = '/user'; // go back to user page
+                navigate('/user'); // go back to user page
             } catch (error) {
                 console.error(error);
                 alert('Failed to delete the game');

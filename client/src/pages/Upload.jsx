@@ -18,7 +18,7 @@ const Upload = () => {
 
     useEffect(() => {
         if (!token) {
-            window.location.href = '/login'; // if not login go to login page instead
+            navigate('/login'); // if not login go to login page instead
         }
     }, [token])
 
