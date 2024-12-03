@@ -89,8 +89,8 @@ const EditGame = () => {
             alert('Game edited successfully');
             window.location.href = '/user'; // go back to user page
         } catch (error) {
-            const errorMessages = error.response.data.errors.map((err) => err.msg);
             console.log(error);
+            const errorMessages = error.response.data.errors.map((err) => err.msg);
             setResult(errorMessages);
         }
     };

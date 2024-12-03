@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../middleware/multer");
+const upload = require("../middleware/multer_db");
 const Game = require("../models/game");
+const Image = require("../models/image");
 const User = require('../models/user');
 const { uploadGameValidator, validate } = require('../middleware/validator')
 const { verifyToken } = require('../middleware/auth')
-const path = require("path")
-const fs = require('fs');
 
 // get all game
 router.get('/allgames', async (req, res) => {
@@ -52,30 +51,40 @@ router.get("/search", async (req, res) => {
     })
 })
 
-// upload new game
 router.post("/upload", verifyToken, upload.single("image"), uploadGameValidator, validate, async (req, res) => {
 
-  // validator for image.
+  // Validator for image.
   if (!req.file) {
-    return res.status(400).json({ msg: "Image is required" });
+    return res.status(400).send("No file uploaded.");
   }
 
-  const { name, description, price, genre, platform } = req.body;
-  const image = req.file.filename;
-  const developer = req.user;
-
-  // create new game instance
-  const newGame = new Game({
-    name,
-    description,
-    price,
-    image,
-    genre,
-    developer,
-    platform
+  const file = req.file;
+  const newImage = new Image({
+    filename: file.originalname,
+    contentType: file.mimetype,
+    imageBuffer: file.buffer,
   });
 
   try {
+    // Save image to database
+    await newImage.save();
+    console.log("File uploaded successfully.");
+
+    const { name, description, price, genre, platform } = req.body;
+    const image = file.originalname;
+    const developer = req.user;
+
+    // Create new game instance
+    const newGame = new Game({
+      name,
+      description,
+      price,
+      image,
+      genre,
+      developer,
+      platform
+    });
+
     // Save game to database
     const savedGame = await newGame.save();
     console.log("Game saved successfully");
@@ -90,7 +99,12 @@ router.post("/upload", verifyToken, upload.single("image"), uploadGameValidator,
 
   } catch (err) {
     console.error("Error:", err);
-    res.status(400).send(err);
+    // If there's an error, remove the uploaded image from the database
+    if (req.file) {
+      await Image.findOneAndDelete({ filename: req.file.originalname });
+      console.log("Image removed due to error.");
+    }
+    res.status(400).send(err); // Send error response
   }
 });
 
@@ -174,24 +188,27 @@ router.put("/update/:id", verifyToken, upload.single("image"), uploadGameValidat
     if (game.developer === username || username === 'admin') {
 
       // Update game details from the request body
-      game.name = req.body.name;
-      game.description = req.body.description;
-      game.genre = req.body.genre;
-      game.price = req.body.price;
-      game.platform = req.body.platform;
+      game.name = req.body.name || game.name;
+      game.description = req.body.description || game.description;
+      game.genre = req.body.genre || game.genre;
+      game.price = req.body.price || game.price;
+      game.platform = req.body.platform || game.platform;
 
-      // If a new image is uploaded, delete the old image
+      // If a new image is uploaded, replace image with the new one
       if (req.file) {
-        // Delete the old image from the server
-        const oldImagePath = path.join(__dirname, "../data/img", game.image);
-        fs.unlink(oldImagePath, (err) => {
-          if (err) {
-            console.error("Error deleting old image:", err);
-          }
-        });
-
-        // Update the game with the new image
-        game.image = req.file.filename;
+        const file = req.file;
+        const imageName = game.image;
+        const image = await Image.findOne({ filename: imageName });
+        if (image) {
+          image.filename = file.originalname;
+          image.contentType = file.mimetype;
+          image.imageBuffer = file.buffer;
+          image.uploadDate = Date.now();
+          game.image = file.originalname;
+          await image.save();
+        } else {
+          return res.status(400).send({ message: "Error fetching the image for update" });
+        }
       }
 
       // Save the updated game
@@ -220,12 +237,10 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     if (game.developer === username || username === 'admin') {
       // If the game has an image, delete it from the server
       if (game.image) {
-        const imagePath = path.join(__dirname, "../data/img", game.image);
-        fs.unlink(imagePath, (err) => {
-          if (err) {
-            console.error("Error deleting image:", err);
-          }
-        });
+        const image = await Image.findOne({ filename: game.image });
+        if (image) {
+          await Image.findByIdAndDelete(image._id);
+        }
       }
 
       // Delete the game from the database
@@ -244,6 +259,30 @@ router.delete("/delete/:id", verifyToken, async (req, res) => {
     console.error(error);
     res.status(500).send({ message: "Server error" });
   }
+});
+
+// route to get an image
+router.get("/image", (req, res) => {
+  const { name } = req.query;
+
+  if (!name) {
+    return res.status(400).json({ error: "Image name is required." });
+  }
+
+  Image.findOne({ filename: name })
+    .then((image) => {
+      if (!image) {
+        return res.status(404).json({ error: "Image not found." });
+      }
+
+      res.set('Content-Type', image.contentType);
+      res.set('Content-Disposition', `inline; filename="${image.filename}"`);
+      res.send(image.imageBuffer);
+    })
+    .catch((error) => {
+      console.error("Error fetching image:", error);
+      res.status(500).json({ error: "Error fetching image." });
+    });
 });
 
 

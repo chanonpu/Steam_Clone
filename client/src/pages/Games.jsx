@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './css/Games.css';
 
 const GamesPage = () => {
   const [games, setGames] = useState([]);
   const [genres, setGenres] = useState([]);
+  const [imageCache, setImageCache] = useState({});
   const [platforms, setPlatforms] = useState([]);
   const [priceFilter, setPriceFilter] = useState({ direction: "", value: "" });
   const navigate = useNavigate();
@@ -33,6 +35,39 @@ const GamesPage = () => {
       console.error('Error fetching game data:', error);
     }
   };
+
+  const fetchImage = async (filename) => {
+    if (imageCache[filename]) {
+      return imageCache[filename];
+    }
+  
+    try {
+      const response = await axios.get(`${SERVER_URL}/game/image`, {
+        params: { name: filename },
+        responseType: 'blob'
+      });
+      const blob = response.data;
+      const url = URL.createObjectURL(blob);
+      setImageCache((prev) => ({ ...prev, [filename]: url }));
+      return url;
+    } catch (error) {
+      console.error("Error fetching image:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const images = await Promise.all(
+        games.map(game => fetchImage(game.image))
+      );
+      // Update imageCache with new images
+    };
+
+    if (games.length > 0) {
+      fetchImages();
+    }
+  }, [games]);
 
   const handleGenreChange = (event) => {
     const value = event.target.value;
@@ -126,7 +161,7 @@ const GamesPage = () => {
             onClick={() => handleCardClick(game._id)}
             style={{ cursor: 'pointer' }}
           >
-            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.name} className="game-image" style={{ height: "300px" }} />
+            <img src={imageCache[game.image] || ""} alt={game.name} className="game-image" style={{ height: "300px" }} />
             <h2 className="game-title">{game.name}</h2>
           </div>
         ))}

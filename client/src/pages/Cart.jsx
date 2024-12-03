@@ -7,6 +7,7 @@ import './css/Cart.css';
 function Cart() {
   const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0); // To track total price
+  const [imageCache, setImageCache] = useState({});
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
   const { logOut } = useAuth(); // Use logOut function from AuthContext
   const navigate = useNavigate(); // Initialize navigate
@@ -37,6 +38,39 @@ function Cart() {
       console.log('Error fetching user data: ', error);
     }
   };
+
+  const fetchImage = async (filename) => {
+    if (imageCache[filename]) {
+      return imageCache[filename];
+    }
+  
+    try {
+      const response = await axios.get(`${SERVER_URL}/game/image`, {
+        params: { name: filename },
+        responseType: 'blob'
+      });
+      const blob = response.data;
+      const url = URL.createObjectURL(blob);
+      setImageCache((prev) => ({ ...prev, [filename]: url }));
+      return url;
+    } catch (error) {
+      console.error("Error fetching image:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const images = await Promise.all(
+        cart.map(game => fetchImage(game.image))
+      );
+      // Update imageCache with new images
+    };
+
+    if (cart.length > 0) {
+      fetchImages();
+    }
+  }, [cart]);
 
   useEffect(() => {
     // Calculate the total price whenever the cart is updated

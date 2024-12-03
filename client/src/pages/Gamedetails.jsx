@@ -7,6 +7,7 @@ import './css/Gamedetails.css';
 const GameDetails = () => {
   const { id } = useParams(); // Get the Game ID from the route
   const [game, setGame] = useState(null);
+  const [image, setImage] = useState('');
   const [loading, setLoading] = useState(true);
   const [purchased, setPurchased] = useState(false);
   const [inCart, setInCart] = useState(false);
@@ -17,14 +18,26 @@ const GameDetails = () => {
 
   useEffect(() => {
     const fetchGame = async () => {
-      setLoading(true); // Set loading to true at the beginning
+      setLoading(true);
       try {
         const response = await axios.get(`${SERVER_URL}/game/fetch/${id}`);
         setGame(response.data);
-        setLoading(false); // Set loading to false after fetching
+        
+        // Only fetch the image after game data is available
+        if (response.data && response.data.image) {
+          const imgResponse = await axios.get(`${SERVER_URL}/game/image`, {
+            params: { name: response.data.image },
+            responseType: 'blob'
+          });
+          const blob = imgResponse.data;
+          const url = URL.createObjectURL(blob);
+          setImage(url);
+        }
+        
+        setLoading(false);
       } catch (error) {
         setError('Error fetching Game details.');
-        setLoading(false); // Ensure loading is false in case of error
+        setLoading(false);
       }
     };
 
@@ -55,6 +68,7 @@ const GameDetails = () => {
         console.log('Error fetching user data: ', error);
       }
     }
+
     fetchGame();
     fetchUserData();
   }, [id]);
@@ -140,7 +154,7 @@ const GameDetails = () => {
       {game && (
         <>
           <h1 className="game-details-title">{game.name}</h1>
-          <img src={`${SERVER_URL}/img/${game.image}`} alt={game.name} className='game-details-image' />
+          <img src={image || ""} alt={game.name} className='game-details-image' />
           <div className="game-details">
             <p><strong>Genre:</strong> {game.genre.join(", ")}</p>
             <p><strong>Release Date:</strong> {formattedDate}</p>

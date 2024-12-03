@@ -9,6 +9,7 @@ const User = () => {
     const [games, setGames] = useState([]);
     const [wishList, setWishList] = useState([]);
     const [gameUploaded, setGameUploaded] = useState([]);
+    const [imageCache, setImageCache] = useState({});
     const navigate = useNavigate();
     const { logOut } = useAuth(); // Use logOut function from AuthContext
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -35,7 +36,7 @@ const User = () => {
                 }
             } catch (error) {
                 // expired token
-                if(error.response.status === 401) {
+                if (error.response.status === 401) {
                     logOut(); // Call logOut to handle centralized logout
                     navigate('/login'); // go to login page
                 }
@@ -45,6 +46,45 @@ const User = () => {
 
         fetchUserData();
     }, []);
+
+    const fetchImage = async (filename) => {
+        if (imageCache[filename]) {
+            return imageCache[filename];
+        }
+
+        try {
+            const response = await axios.get(`${SERVER_URL}/game/image`, {
+                params: { name: filename },
+                responseType: 'blob'
+            });
+            const blob = response.data;
+            const url = URL.createObjectURL(blob);
+            setImageCache((prev) => ({ ...prev, [filename]: url }));
+            return url;
+        } catch (error) {
+            console.error("Error fetching image:", error);
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const fetchImages = async () => {
+            const gamesImages = await Promise.all(
+                games.map(game => fetchImage(game.image))
+            );
+            const wishlistImages = await Promise.all(
+                wishList.map(game => fetchImage(game.image))
+            );
+            const uploadedImages = await Promise.all(
+                gameUploaded.map(game => fetchImage(game.image))
+            );
+            // Update imageCache with new images
+        };
+
+        if (games.length > 0 || wishList.length > 0 || gameUploaded.length > 0) {
+            fetchImages();
+        }
+    }, [games, wishList, gameUploaded]);
 
     const handleLogout = async () => {
         try {
@@ -85,7 +125,7 @@ const User = () => {
                         onClick={() => handleGameClick(game._id)}
                         style={{ cursor: 'pointer' }}
                     >
-                        <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
+                        <img src={imageCache[game.image] || ""} alt={game.title} className="user-game-image" />
                         <div className="user-game-info">
                             <h3>{game.name}</h3>
                         </div>
@@ -103,7 +143,7 @@ const User = () => {
                         onClick={() => handleGameClick(game._id)}
                         style={{ cursor: 'pointer' }}
                     >
-                        <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
+                        <img src={imageCache[game.image] || ""} alt={game.title} className="user-game-image" />
                         <div className="user-game-info">
                             <h3>{game.name}</h3>
                         </div>
@@ -122,7 +162,7 @@ const User = () => {
                             onClick={() => handleEditGameClick(game._id)}
                             style={{ cursor: 'pointer' }}
                         >
-                            <img src={`${SERVER_URL}/img/${game.image}`} alt={game.title} className="user-game-image" />
+                            <img src={imageCache[game.image] || ""} alt={game.title} className="user-game-image" />
                             <div className="user-game-info">
                                 <h3>{game.name}</h3>
                             </div>

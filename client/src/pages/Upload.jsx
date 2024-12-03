@@ -75,8 +75,8 @@ const Upload = () => {
             alert('Game uploaded successfully');
             navigate(`/user/`)
         } catch (error) {
-            const errorMessages = error.response.data.errors.map((err) => err.msg);
             console.log(error);
+            const errorMessages = error.response.data.errors.map((err) => err.msg);
             setResult(errorMessages);
         }
     };

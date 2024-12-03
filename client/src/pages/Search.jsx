@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/Search.css';
@@ -6,6 +6,7 @@ import './css/Search.css';
 const Search = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
+  const [imageCache, setImageCache] = useState({});
   const navigate = useNavigate();
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -18,6 +19,39 @@ const Search = () => {
       console.log('Error searching:', error);
     }
   };
+  
+  const fetchImage = async (filename) => {
+    if (imageCache[filename]) {
+      return imageCache[filename];
+    }
+  
+    try {
+      const response = await axios.get(`${SERVER_URL}/game/image`, {
+        params: { name: filename },
+        responseType: 'blob'
+      });
+      const blob = response.data;
+      const url = URL.createObjectURL(blob);
+      setImageCache((prev) => ({ ...prev, [filename]: url }));
+      return url;
+    } catch (error) {
+      console.error("Error fetching image:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const images = await Promise.all(
+        results.map(game => fetchImage(game.image))
+      );
+      // Update imageCache with new images
+    };
+
+    if (results.length > 0) {
+      fetchImages();
+    }
+  }, [results]);
 
   const handleGameClick = (gameId) => {
     navigate(`/games/${gameId}`);
@@ -46,7 +80,7 @@ const Search = () => {
             >
               <div className="search-image-container">
                 <img
-                  src={`${SERVER_URL}/img/${game.image}`}
+                  src={imageCache[game.image] || ""}
                   alt={game.title}
                   className="search-game-image"
                 />
