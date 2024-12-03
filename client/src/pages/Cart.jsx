@@ -129,7 +129,7 @@ function Cart() {
             {cart.map((game) => (
               <li key={game._id} className="cart-game-row">
                 <img
-                  src={`${SERVER_URL}/img/${game.image}`}
+                  src={imageCache[game.image] || ""}
                   alt={game.title}
                   className="cart-game-image"
                 />

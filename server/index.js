@@ -2,7 +2,6 @@ require('dotenv').config();
 const PORT = process.env.PORT || 8000;
 const express = require("express");
 const app = express();
-const path = require("path")
 const cors = require("cors");
 
 
@@ -33,7 +32,6 @@ db.on("error", (err) => {
 // routes
 app.use("/game", game_router);
 app.use("/user", user_router);
-app.use('/img', express.static(path.join(__dirname, 'data/img')));
 
 app.get("/", (req, res) => {
   res.send("Welcome to our server")

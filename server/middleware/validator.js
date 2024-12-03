@@ -48,9 +48,9 @@ const validate = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         if (req.file) { // if error remove the file uploadeed
-            fs.unlink(path.join(__dirname, `../data/img/${req.file.filename}`), (err) => {
-                if (err) console.error("Failed to remove file:", err);
-            })};
+            Image.findOneAndDelete({ filename: req.file.originalname });
+            console.log("Image removed due to error.");
+        };
         return res.status(400).json({ errors: errors.array() });
     }
     next();
