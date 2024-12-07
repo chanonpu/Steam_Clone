@@ -21,4 +21,4 @@ This project is a full-stack web application that allows users to register, log 
 - **Node.js**: JavaScript runtime environment for running the backend.
 - **Express.js**: Web framework for Node.js used to handle routes and API requests.
 - **Multer**: Middleware used for handling file uploads.
-- **MongoDB** (or other DB): Used for storing user and game data
+- **MongoDB**: Used for storing user and game data
